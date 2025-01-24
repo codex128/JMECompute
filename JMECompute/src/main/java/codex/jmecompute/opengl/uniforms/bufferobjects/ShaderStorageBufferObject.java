@@ -100,7 +100,7 @@ public abstract class ShaderStorageBufferObject <T extends NativeObject, R> exte
         } else if (buf instanceof long[]) {
             GL45.glBufferData(GL45.GL_SHADER_STORAGE_BUFFER, (long[])buf, usage);
         } else if (buf instanceof Long) {
-            GL45.glBufferData(GL45.GL_SHADER_STORAGE_BUFFER, (long)buf, usage);
+            GL45.glBufferData(GL45.GL_SHADER_STORAGE_BUFFER, (Long)buf, usage);
         } else {
             throw new UnsupportedOperationException("Cannot bind with " + buf.getClass().getName());
         }
