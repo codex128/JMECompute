@@ -1,10 +1,8 @@
+
 plugins {
     id 'java-library'
     id 'maven-publish'
 }
-
-group = 'codex.renthyl'
-version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -18,6 +16,7 @@ project.ext {
 
 dependencies {
     implementation "org.jmonkeyengine:jme3-core:$jmeVer"
+    implementation "org.jmonkeyengine:jme3-lwjgl3:$jmeVer"
     implementation "com.github.codex128:Boost:$boostVer"
 }
 
