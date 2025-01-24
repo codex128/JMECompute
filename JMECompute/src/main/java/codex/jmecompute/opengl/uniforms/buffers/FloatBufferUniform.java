@@ -98,7 +98,8 @@ public class FloatBufferUniform extends AbstractArrayUniform<FloatBuffer> {
         for (float f : array) {
             miscBuf.put(f);
         }
-        return miscBuf.flip();
+        miscBuf.flip();
+        return miscBuf;
     }
     private <T> FloatBuffer fillMiscBuffer(T[] array, int components, BiFunction<T, Integer, Float> mapper) {
         miscBuf = BufferUtils.ensureLargeEnough(miscBuf, array.length * components);
@@ -109,7 +110,8 @@ public class FloatBufferUniform extends AbstractArrayUniform<FloatBuffer> {
                 miscBuf.put(i++, mapper.apply(t, j));
             }
         }
-        return miscBuf.flip();
+        miscBuf.flip();
+        return miscBuf;
     }
 
     @Override
