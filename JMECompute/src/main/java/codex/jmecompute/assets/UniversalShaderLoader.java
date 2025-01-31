@@ -29,8 +29,7 @@ public class UniversalShaderLoader implements AssetLoader {
     public static final String[] EXTENSIONS = {"glsl", "glsllib", "frag", "vert", "geom", "tsctrl", "tseval", "glsd"};
     private static final String WHITESPACE = "\\p{javaWhitespace}+";
     private static boolean registered = false;
-    
-    private final HashMap<String, DependencyNode> dependencies = new HashMap<>();
+
     private final List<CompiledScript> shaderDefApi = new ArrayList<>();
     private GLSLLoader legacyLoader;
     
@@ -43,15 +42,10 @@ public class UniversalShaderLoader implements AssetLoader {
         AssetKey key = assetInfo.getKey();
         if (key instanceof ShaderKey) {
             ShaderKey shaderKey = (ShaderKey)key;
-            Object result = loadSourceCode(assetInfo, shaderKey);
-            if (shaderKey.isRootCall()) {
-                String code = resolveDependencies();
-                if (shaderKey instanceof OpenGLComputeKey) {
-                    OpenGLComputeKey compute = (OpenGLComputeKey)shaderKey;
-                    result = new GLComputeShader(compute.getName(), compute.getVersions(), code);
-                } else if (shaderKey instanceof CodeKey) {
-                    result = code;
-                }
+            String result = loadSourceCode(assetInfo, shaderKey);
+            if (shaderKey.isRootCall() && shaderKey instanceof OpenGLComputeKey) {
+                OpenGLComputeKey compute = (OpenGLComputeKey)shaderKey;
+                return new GLComputeShader(compute.getName(), compute.getVersions(), result);
             }
             return result;
         }
@@ -61,72 +55,44 @@ public class UniversalShaderLoader implements AssetLoader {
         return legacyLoader.load(assetInfo);
     }
     
-    private DependencyNode loadSourceCode(AssetInfo info, ShaderKey key) throws IOException {
-        DependencyNode d = new DependencyNode(key.getName());
-        dependencies.put(d.file, d);
+    private String loadSourceCode(AssetInfo info, ShaderKey key) throws IOException {
+        StringBuilder code = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(info.openStream()))) {
             int lineNumber = 1;
             for (String line; (line = br.readLine()) != null; lineNumber++) {
-                if (line.trim().startsWith("#import ")) {
+                String lineTrim = line.trim();
+                boolean importReg = lineTrim.startsWith("#import ");
+                boolean importInline = lineTrim.startsWith("#importinline ");
+                if (importReg || importInline) {
                     line = line.trim();
-                    int i = line.indexOf('"');
-                    int j = line.lastIndexOf('"');
-                    if (i < 0 || j == i) {
-                        throw new IOException("Incorrect import syntax on line " + lineNumber + " in " + d.file);
-                    }
-                    String libFile = line.substring(i + 1, j);
-                    if (libFile.equals(d.file)) {
-                        throw new IOException("Shader cannot depend on itself (" + d.file + ")");
-                    }
+                    String libFile = getImportedFileName(key, line, lineNumber);
                     if (key.callChainContains(libFile)) {
                         throw new IOException("Circular dependency detected involving " + libFile);
                     }
-                    DependencyNode lib = dependencies.get(libFile);
-                    if (lib == null) {
-                        lib = info.getManager().loadAsset(new ShaderKey<>(libFile, key));
-                    }
-                    lib.addImporter(d);
+                    code.append("// ---- Begin import of ").append(key.getName()).append('\n');
+                    code.append(info.getManager().loadAsset(new ShaderKey<String>(libFile, key))).append('\n');
+                    code.append("// ---- End import of ").append(key.getName()).append('\n');
                 } else {
-                    d.contents.append(line).append('\n');
+                    code.append(line).append('\n');
                 }
             }
         }
-        return d;
-    }
-    private String resolveDependencies() throws IOException {
-        if (dependencies.isEmpty()) {
-            throw new IOException("No shader dependencies to resolve.");
-        }
-        LinkedList<DependencyNode> ready = new LinkedList<>();
-        for (DependencyNode n : dependencies.values()) {
-            if (n.unresolved <= 0) {
-                ready.addLast(n);
-            }
-        }
-        if (ready.isEmpty()) {
-            throw new IOException("Shader dependencies unsolvable.");
-        }
-        StringBuilder code = new StringBuilder();
-        while (!ready.isEmpty()) {
-            DependencyNode n = ready.pollFirst();
-            code.append("// ---- begin import of ").append(n.file).append('\n');
-            code.append(n.contents).append('\n');
-            code.append("// ---- end import of ").append(n.file).append('\n');
-            for (DependencyNode i : n.importers) {
-                if (i.resolveDependency()) {
-                    ready.addLast(i);
-                }
-            }
-        }
-        for (DependencyNode n : dependencies.values()) {
-            if (n.unresolved > 0) {
-                throw new IOException("Unresolved shader dependencies detected.");
-            }
-        }
-        dependencies.clear();
         return code.toString();
     }
-    
+
+    private String getImportedFileName(ShaderKey key, String line, int lineNumber) throws IOException {
+        int i = line.indexOf('"');
+        int j = line.lastIndexOf('"');
+        if (i < 0 || j == i) {
+            throw new IOException("Incorrect import syntax on line " + lineNumber + " in " + key.getName());
+        }
+        String libFile = line.substring(i + 1, j);
+        if (libFile.equals(key.getName())) {
+            throw new IOException("Shader cannot depend on itself (" + key.getName() + ")");
+        }
+        return libFile;
+    }
+
     public static void register(AssetManager assetManager) {
         register(assetManager, EXTENSIONS);
     }
@@ -204,31 +170,6 @@ public class UniversalShaderLoader implements AssetLoader {
 
         public Glsl[] getVersions() {
             return versions;
-        }
-        
-    }
-    private static class DependencyNode {
-        
-        public final String file;
-        public final StringBuilder contents = new StringBuilder();
-        private final ArrayList<DependencyNode> importers = new ArrayList<>();
-        private int unresolved = 0;
-        
-        public DependencyNode(String fileName) {
-            this.file = fileName;
-        }
-        
-        public void addImporter(DependencyNode n) {
-            importers.add(n);
-            n.unresolved++;
-        }
-        
-        public boolean resolveDependency() {
-            return --unresolved <= 0;
-        }
-        
-        public boolean isResolved() {
-            return unresolved <= 0;
         }
         
     }
