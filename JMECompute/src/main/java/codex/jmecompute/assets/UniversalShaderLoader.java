@@ -84,10 +84,11 @@ public class UniversalShaderLoader implements AssetLoader {
                     if (key.callChainContains(libFile)) {
                         throw new IOException("Circular dependency detected involving " + libFile);
                     }
-                    if (!dependencies.containsKey(libFile)) {
-                        info.getManager().loadAsset(new ShaderKey<DependencyNode>(libFile, key));
+                    DependencyNode lib = dependencies.get(libFile);
+                    if (lib == null) {
+                        lib = info.getManager().loadAsset(new ShaderKey<>(libFile, key));
                     }
-                    dependencies.get(libFile).addImporter(d);
+                    lib.addImporter(d);
                 } else {
                     d.contents.append(line).append('\n');
                 }
@@ -105,9 +106,9 @@ public class UniversalShaderLoader implements AssetLoader {
         StringBuilder code = new StringBuilder();
         while (!ready.isEmpty()) {
             DependencyNode n = ready.pollFirst();
-            code.append("// ---- begin import of ").append(n.file);
-            code.append(code);
-            code.append("// ---- end import of ").append(n.file);
+            code.append("// ---- begin import of ").append(n.file).append('\n');
+            code.append(n.contents).append('\n');
+            code.append("// ---- end import of ").append(n.file).append('\n');
             for (DependencyNode i : n.importers) {
                 if (i.resolveDependency()) {
                     ready.addLast(i);
