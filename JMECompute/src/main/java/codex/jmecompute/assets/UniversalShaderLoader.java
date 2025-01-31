@@ -55,9 +55,6 @@ public class UniversalShaderLoader implements AssetLoader {
             }
             return result;
         }
-        if (key instanceof OpenGLComputeDefKey) {
-            return loadShaderDef(assetInfo, (OpenGLComputeDefKey)key);
-        }
         if (legacyLoader == null) {
             legacyLoader = new GLSLLoader();
         }
@@ -96,12 +93,18 @@ public class UniversalShaderLoader implements AssetLoader {
         }
         return d;
     }
-    private String resolveDependencies() {
+    private String resolveDependencies() throws IOException {
+        if (dependencies.isEmpty()) {
+            throw new IOException("No shader dependencies to resolve.");
+        }
         LinkedList<DependencyNode> ready = new LinkedList<>();
         for (DependencyNode n : dependencies.values()) {
             if (n.unresolved <= 0) {
                 ready.addLast(n);
             }
+        }
+        if (ready.isEmpty()) {
+            throw new IOException("Shader dependencies unsolvable.");
         }
         StringBuilder code = new StringBuilder();
         while (!ready.isEmpty()) {
@@ -115,12 +118,13 @@ public class UniversalShaderLoader implements AssetLoader {
                 }
             }
         }
+        for (DependencyNode n : dependencies.values()) {
+            if (n.unresolved > 0) {
+                throw new IOException("Unresolved shader dependencies detected.");
+            }
+        }
         dependencies.clear();
         return code.toString();
-    }
-    
-    private HashMap<String, GLComputeShader> loadShaderDef(AssetInfo info, OpenGLComputeDefKey key) {
-        throw new UnsupportedOperationException();
     }
     
     public static void register(AssetManager assetManager) {
@@ -146,49 +150,6 @@ public class UniversalShaderLoader implements AssetLoader {
     public static GLComputeShader loadComputeShader(AssetManager assetManager, String name, Glsl... versions) {
         register(assetManager);
         return assetManager.loadAsset(new OpenGLComputeKey(versions, name));
-    }
-    public static ComputeShaderMap loadComputeShaderDef(AssetManager assetManager, String name) {
-        return assetManager.loadAsset(new OpenGLComputeDefKey(name));
-    }
-    
-    public static class ComputeShaderMap extends HashMap<String, List<GLComputeShader>> {
-        
-        public static final String DEFAULT = "DEFAULT_SHADER_DEF";
-        
-        public GLComputeShader get(String name, int index) {
-            List<GLComputeShader> list = get(name);
-            if (list == null) {
-                return null;
-            }
-            return list.get(index);
-        }
-        public GLComputeShader get(int index) {
-            return get(DEFAULT, index);
-        }
-        public GLComputeShader getFirst(String name) {
-            return get(name, 0);
-        }
-        public GLComputeShader getFirst() {
-            return get(DEFAULT, 0);
-        }
-        public GLComputeShader getSupported(String name, Glsl supportedVersion) {
-            List<GLComputeShader> list = get(name);
-            if (list == null) {
-                return null;
-            }
-            for (GLComputeShader s : list) {
-                for (Glsl v : s.getVersions()) {
-                    if (v == supportedVersion) {
-                        return s;
-                    }
-                }
-            }
-            return null;
-        }
-        public GLComputeShader getSupported(Glsl supportedVersion) {
-            return getSupported(DEFAULT, supportedVersion);
-        }
-        
     }
     
     private static class ShaderKey <T> extends AssetKey<T> {
@@ -243,13 +204,6 @@ public class UniversalShaderLoader implements AssetLoader {
 
         public Glsl[] getVersions() {
             return versions;
-        }
-        
-    }
-    private static class OpenGLComputeDefKey extends AssetKey<ComputeShaderMap> {
-
-        public OpenGLComputeDefKey(String name) {
-            super(name);
         }
         
     }
