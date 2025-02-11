@@ -5,6 +5,7 @@
 package codex.jmecompute.opengl.uniforms.buffers;
 
 import codex.jmecompute.Stride;
+import codex.jmecompute.opengl.GLRenderUtils;
 import codex.jmecompute.opengl.UniformBindUnits;
 import static codex.jmecompute.opengl.uniforms.buffers.FloatBufferUniform.*;
 import com.jme3.asset.AssetManager;
@@ -17,6 +18,7 @@ import com.jme3.math.Vector4f;
 import com.jme3.util.NativeObject;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.function.BiFunction;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL21;
@@ -104,15 +106,6 @@ public class FloatArrayUniform extends AbstractArrayUniform<float[]> {
             miscArray[i] = buffer.get(i);
         }
         return miscArray;
-    }
-    
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        float[] array = new float[values.length];
-        for (int i = 0; i < values.length; i++) {
-            array[i] = Float.parseFloat(values[i]);
-        }
-        return array;
     }
     
 }

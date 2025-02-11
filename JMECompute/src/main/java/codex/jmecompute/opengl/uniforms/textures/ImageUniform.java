@@ -28,15 +28,5 @@ public class ImageUniform extends AbstractTextureUniform<TextureImage> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         uploadImage(value, units.pollTextureUnit());
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        Texture tex = assetManager.loadTexture(values[0]);
-        TextureImage.Access access = TextureImage.Access.ReadWrite;
-        if (values.length >= 2) {
-            access = Enum.valueOf(TextureImage.Access.class, values[1]);
-        }
-        return new TextureImage(tex, access);
-    }
     
 }

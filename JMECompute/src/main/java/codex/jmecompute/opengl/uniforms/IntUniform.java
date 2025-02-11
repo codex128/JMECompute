@@ -23,10 +23,5 @@ public class IntUniform extends AbstractUniform<Integer> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         GL20.glUniform1i(uniform, value);
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) {
-        return Integer.valueOf(values[0]);
-    }
     
 }

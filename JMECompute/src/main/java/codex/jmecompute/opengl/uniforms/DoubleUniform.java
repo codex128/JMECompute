@@ -23,10 +23,5 @@ public class DoubleUniform extends AbstractUniform<Double> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         GL45.glUniform1d(uniform, value);
     }
-
-    @Override
-    public Double parse(AssetManager assetManager, String[] values) {
-        return Double.valueOf(values[0]);
-    }
     
 }

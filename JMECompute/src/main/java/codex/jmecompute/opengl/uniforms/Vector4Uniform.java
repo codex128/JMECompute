@@ -41,12 +41,5 @@ public class Vector4Uniform extends AbstractUniform<Vector4f> {
         }
         return super.set(value);
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        requireMinParseValues(values, 4);
-        return new Vector4f(Float.parseFloat(values[0]), Float.parseFloat(values[1]),
-                Float.parseFloat(values[2]), Float.parseFloat(values[3]));
-    }
     
 }

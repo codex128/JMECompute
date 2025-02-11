@@ -23,10 +23,5 @@ public class BooleanUniform extends AbstractUniform<Boolean> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         GL45.glUniform1i(uniform, value ? GL45.GL_TRUE : GL45.GL_FALSE);
     }
-
-    @Override
-    public Boolean parse(AssetManager assetManager, String[] values) {
-        return Boolean.valueOf(values[0]);
-    }
     
 }

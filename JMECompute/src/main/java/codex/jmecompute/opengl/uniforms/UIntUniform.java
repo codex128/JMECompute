@@ -24,10 +24,5 @@ public class UIntUniform extends AbstractUniform<Integer> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         GL30.glUniform1ui(uniform, value);
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        return Integer.parseUnsignedInt(values[0]);
-    }
     
 }

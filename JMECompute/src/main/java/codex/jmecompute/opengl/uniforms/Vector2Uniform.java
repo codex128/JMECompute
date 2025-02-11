@@ -26,11 +26,5 @@ public class Vector2Uniform extends AbstractUniform<Vector2f> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         GL20.glUniform2f(uniform, value.x, value.y);
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        requireMinParseValues(values, 2);
-        return new Vector2f(Float.parseFloat(values[0]), Float.parseFloat(values[1]));
-    }
     
 }

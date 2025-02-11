@@ -98,26 +98,6 @@ public interface GLUniform <T> {
     }
     
     /**
-     * Generates and returns a potential internal value from the array of
-     * string values.
-     * <p>
-     * This method should not directly assign the generated value to this uniform.
-     * That should be responsibility of the caller to perform if desired.
-     * <p>
-     * The default implementation throws an {@link UnsupportedOperationException}.
-     * Uniform implements are expected to explicitely override this method if they
-     * support parsing.
-     * 
-     * @param assetManager
-     * @param values strings to generate the value from
-     * @return generated value
-     * @throws IOException 
-     */
-    public default Object parse(AssetManager assetManager, String[] values) throws IOException {
-        throw new UnsupportedOperationException("Parsing is not supported for " + getClass().getName());
-    }
-    
-    /**
      * Gets the OpenGL location of the named uniform in the shader.
      * 
      * @param shader
@@ -127,10 +107,7 @@ public interface GLUniform <T> {
      */
     public default int getUniformLocation(NativeObject shader, String name, int currentLocation) {
         if (shader.isUpdateNeeded() || currentLocation == -1) {
-            GLRenderUtils.checkError();
-            int u = glGetUniformLocation(shader.getId(), name);
-            GLRenderUtils.checkError();
-            return u;
+            return glGetUniformLocation(shader.getId(), name);
         } else {
             return currentLocation;
         }

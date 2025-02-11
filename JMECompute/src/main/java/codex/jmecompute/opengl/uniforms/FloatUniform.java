@@ -23,10 +23,5 @@ public class FloatUniform extends AbstractUniform<Float> {
     public void update(NativeObject shader, UniformBindUnits units) {
         GL20.glUniform1f(uniform, value);
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) {
-        return Float.valueOf(values[0]);
-    }
     
 }

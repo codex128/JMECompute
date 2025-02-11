@@ -27,10 +27,5 @@ public class TextureUniform extends AbstractTextureUniform<Texture> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         uploadTexture(value, units.pollTextureUnit());
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        return assetManager.loadTexture(values[0]);
-    }
     
 }

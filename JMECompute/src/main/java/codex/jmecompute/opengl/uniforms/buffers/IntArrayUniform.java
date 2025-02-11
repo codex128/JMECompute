@@ -38,13 +38,4 @@ public class IntArrayUniform extends AbstractArrayUniform<int[]> {
         }
     }
     
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        int[] array = new int[values.length];
-        for (int i = 0; i < values.length; i++) {
-            array[i] = Integer.parseInt(values[i]);
-        }
-        return array;
-    }
-    
 }

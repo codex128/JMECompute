@@ -28,14 +28,5 @@ public class TextureArrayUniform extends AbstractTextureUniform<Texture[]> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         uploadTextures(Arrays.stream(value), value.length, units);
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        Texture[] textures = new Texture[values.length];
-        for (int i = 0; i < values.length; i++) {
-            textures[i] = assetManager.loadTexture(values[i]);
-        }
-        return textures;
-    }
     
 }

@@ -34,21 +34,12 @@ public class Matrix4Uniform extends MatrixUniform<Matrix4f> {
     @Override
     public boolean set(Object value) {
         if (super.set(value)) {
+            buffer.rewind();
             this.value.fillFloatBuffer(buffer, columnMajor);
+            buffer.rewind();
             return true;
         }
         return false;
-    }
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        float[] mat = new float[16];
-        requireMinParseValues(values, mat.length);
-        for (int i = 0; i < mat.length; i++) {
-            mat[i] = Float.parseFloat(values[i]);
-        }
-        Matrix4f result = new Matrix4f();
-        result.set(mat, !columnMajor);
-        return result;
     }
     
 }

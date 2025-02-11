@@ -48,14 +48,5 @@ public class DoubleBufferUniform extends AbstractArrayUniform<DoubleBuffer> {
             default: throw new UnsupportedOperationException("DoubleBuffer division size: " + stride.name());
         }
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        DoubleBuffer buf = BufferUtils.createDoubleBuffer(values.length);
-        for (int i = 0; i < values.length; i++) {
-            buf.put(i, Double.parseDouble(values[i]));
-        }
-        return buf;
-    }
     
 }

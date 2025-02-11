@@ -37,14 +37,5 @@ public class UIntArrayUniform extends AbstractArrayUniform<int[]> {
             default: throw new UnsupportedOperationException("Unsigned int[] division size: " + stride.name());
         }
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        int[] array = new int[values.length];
-        for (int i = 0; i < values.length; i++) {
-            array[i] = Integer.parseUnsignedInt(values[i]);
-        }
-        return array;
-    }
     
 }

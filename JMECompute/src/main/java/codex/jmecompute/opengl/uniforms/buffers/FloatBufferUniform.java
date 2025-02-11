@@ -113,15 +113,6 @@ public class FloatBufferUniform extends AbstractArrayUniform<FloatBuffer> {
         miscBuf.flip();
         return miscBuf;
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-       FloatBuffer buf = BufferUtils.createFloatBuffer(values.length);
-        for (int i = 0; i < values.length; i++) {
-            buf.put(i, Float.parseFloat(values[i]));
-        }
-        return buf;
-    }
     
     private static float getColorComponent(ColorRGBA color, int i) {
         switch (i) {

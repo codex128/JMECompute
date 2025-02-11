@@ -29,14 +29,5 @@ public class ImageCollectionUniform extends AbstractTextureUniform<Collection<Te
     protected void update(NativeObject shader, UniformBindUnits units) {
         uploadImages(value.stream(), value.size(), units);
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        ArrayList<TextureImage> images = new ArrayList<>(values.length);
-        for (String v : values) {
-            images.add(new TextureImage(assetManager.loadTexture(v)));
-        }
-        return images;
-    }
     
 }

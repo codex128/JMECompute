@@ -46,7 +46,7 @@ public class GLComputeShader extends NativeObject {
     public static final String DYNAMIC_LOCAL_SIZE_HINT = "@dynamic_local_size";
     public static final long NATIVE_BASE_ID = 12; // see NativeObject
     private static final Logger LOG = Logger.getLogger(GLComputeShader.class.getName());
-    private static final HashMap<Class, Function<String, GLUniform>> nativeUniforms = new HashMap<>();
+    private static final HashMap<Class<?>, Function<String, GLUniform<?>>> nativeUniforms = new HashMap<>();
     
     static {
         nativeUniforms.put(Boolean.class, n -> new BooleanUniform(n));
@@ -124,18 +124,12 @@ public class GLComputeShader extends NativeObject {
 
     /**
      * Executes this compute shader with the given work size.
-     * <p>
-     * If the shader source contains a {@link #dynamicLocalSize()} hint, the
-     * work size's local size will be inserted into the shader source code
-     * before execution.
      *
      * @param workSize amount of work for the compute shader to perform, or null
      * to use the default work size
      */
     public void execute(WorkSize workSize) {
-        if (workSize == null) {
-            workSize = this.work;
-        }
+        assert workSize != null : "Compute work cannot be null.";
         updateUniformDefines();
         parseRuntimeHints();
         compileSource(workSize);
@@ -240,21 +234,23 @@ public class GLComputeShader extends NativeObject {
             }
         }
         if (version == null) {
-            throw new NullPointerException("No available version supported by the hardware.");
+            throw new NullPointerException("No specified OpenGL version is supported by the hardware.");
         }
         if (version.getVersion() < MIN_VERSION.getVersion()) {
-            throw new NullPointerException("Maximum available version supported "
+            throw new NullPointerException("Maximum available OpenGL version supported "
                     + "by the hardware does not support compute shaders.");
         }
         return version;
     }
     private void updateUniforms() {
+        GLRenderUtils.checkError();
         for (GLUniform u : uniforms.values()) {
             if (updateNeeded) {
                 u.setUpdateFlag();
                 u.resetUniformLocation();
             }
             u.updateValue(this, units);
+            GLRenderUtils.checkError(u.getName());
         }
         units.reset();
     }
@@ -369,7 +365,7 @@ public class GLComputeShader extends NativeObject {
         Class type = value != null ? value.getClass() : null;
         GLUniform u = uniforms.get(name);
         while (u == null && type != null) {
-            Function<String, GLUniform> factory = nativeUniforms.get(type);
+            Function<String, GLUniform<?>> factory = nativeUniforms.get(type);
             if (factory != null) {
                 u = factory.apply(name);
                 if (u != null) {

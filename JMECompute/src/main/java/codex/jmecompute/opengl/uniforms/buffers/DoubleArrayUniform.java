@@ -46,14 +46,5 @@ public class DoubleArrayUniform extends AbstractArrayUniform<double[]> {
             default: throw new UnsupportedOperationException("double[] division size: " + stride.name());
         }
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        double[] array = new double[values.length];
-        for (int i = 0; i < values.length; i++) {
-            array[i] = Double.parseDouble(values[i]);
-        }
-        return array;
-    }
     
 }

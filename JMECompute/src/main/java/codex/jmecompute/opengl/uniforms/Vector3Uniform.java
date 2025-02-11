@@ -26,12 +26,5 @@ public class Vector3Uniform extends AbstractUniform<Vector3f> {
     protected void update(NativeObject shader, UniformBindUnits units) {
         GL20.glUniform3f(uniform, value.x, value.y, value.z);
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        requireMinParseValues(values, 3);
-        return new Vector3f(Float.parseFloat(values[0]),
-                Float.parseFloat(values[1]), Float.parseFloat(values[2]));
-    }
     
 }

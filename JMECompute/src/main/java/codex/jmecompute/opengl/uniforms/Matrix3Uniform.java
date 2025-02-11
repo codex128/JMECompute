@@ -35,18 +35,10 @@ public class Matrix3Uniform extends MatrixUniform<Matrix3f> {
     public boolean set(Object value) {
         if (super.set(value)) {
             this.value.fillFloatBuffer(buffer, columnMajor);
+            buffer.rewind();
             return true;
         }
         return false;
-    }
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        float[] mat = new float[9];
-        requireMinParseValues(values, mat.length);
-        for (int i = 0; i < mat.length; i++) {
-            mat[i] = Float.parseFloat(values[i]);
-        }
-        return new Matrix3f().set(mat, !columnMajor);
     }
     
 }

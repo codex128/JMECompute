@@ -39,14 +39,5 @@ public class IntBufferUniform extends AbstractArrayUniform<IntBuffer> {
             default: throw new UnsupportedOperationException("IntBuffer division size: " + stride.name());
         }
     }
-
-    @Override
-    public Object parse(AssetManager assetManager, String[] values) throws IOException {
-        IntBuffer buf = BufferUtils.createIntBuffer(values.length);
-        for (int i = 0; i < values.length; i++) {
-            buf.put(i, Integer.parseInt(values[i]));
-        }
-        return buf;
-    }
     
 }
