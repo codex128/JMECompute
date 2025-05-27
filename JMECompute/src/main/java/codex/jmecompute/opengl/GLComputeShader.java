@@ -212,6 +212,7 @@ public class GLComputeShader extends NativeObject {
                         .append(", local_size_y=").append(workSize.getLocalY())
                         .append(", local_size_z=").append(workSize.getLocalZ()).append(") in;\n");
         }
+        result.append("#define COMPUTE_SHADER 1\n");
         for (ComputeDefine d : defines) {
             if (d.isEnabled()) {
                 result.append("#define ")

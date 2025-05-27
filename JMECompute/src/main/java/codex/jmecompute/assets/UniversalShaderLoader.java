@@ -27,7 +27,6 @@ import javax.script.CompiledScript;
 public class UniversalShaderLoader implements AssetLoader {
     
     public static final String[] EXTENSIONS = {"glsl", "glsllib", "frag", "vert", "geom", "tsctrl", "tseval", "glsd"};
-    private static final String WHITESPACE = "\\p{javaWhitespace}+";
     private static boolean registered = false;
 
     private final List<CompiledScript> shaderDefApi = new ArrayList<>();
