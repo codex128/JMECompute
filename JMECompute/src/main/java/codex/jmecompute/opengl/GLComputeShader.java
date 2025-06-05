@@ -96,7 +96,6 @@ public class GLComputeShader extends NativeObject {
         }
         this.id = glCreateProgram();
         this.nativeId = GLRenderUtils.get().getUniqueNativeId();
-        GLRenderUtils.checkError();
         GLRenderUtils.get().registerNative((NativeObject) this);
     }
     
@@ -138,7 +137,6 @@ public class GLComputeShader extends NativeObject {
         updateUniforms();
         glDispatchCompute(workSize.getGlobalX(), workSize.getGlobalY(), workSize.getGlobalZ());
         glMemoryBarrier(barrier.getBarrier());
-        GLRenderUtils.checkError();
         this.work.set(workSize);
         updateNeeded = false;
     }
@@ -165,7 +163,6 @@ public class GLComputeShader extends NativeObject {
             return;
         }
         // build source
-        GLRenderUtils.checkError();
         String source = buildSource(workSize);
         if (shader < 0) {
             // create shader, compile, and link program
@@ -199,7 +196,6 @@ public class GLComputeShader extends NativeObject {
                 throw new RuntimeException("Compile error in " + name + "\n" + info);
             }
         }
-        GLRenderUtils.checkError();
     }
     private String buildSource(WorkSize workSize) {
         StringBuilder result = new StringBuilder();
@@ -244,14 +240,12 @@ public class GLComputeShader extends NativeObject {
         return version;
     }
     private void updateUniforms() {
-        GLRenderUtils.checkError();
         for (GLUniform u : uniforms.values()) {
             if (updateNeeded) {
                 u.setUpdateFlag();
                 u.resetUniformLocation();
             }
             u.updateValue(this, units);
-            GLRenderUtils.checkError(u.getName());
         }
         units.reset();
     }
@@ -382,7 +376,7 @@ public class GLComputeShader extends NativeObject {
         ComputeDefine define = defines.stream().filter(d -> d.name.equals(defineName)).findAny().orElse(null);
         if (define == null) {
             define = new ComputeDefine(defineName);
-            getUniform(name).setDefine(define);
+            getUniform(uniformName).setDefine(define);
             defines.add(define);
         }
     }

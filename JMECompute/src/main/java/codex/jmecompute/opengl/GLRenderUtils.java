@@ -18,6 +18,7 @@ import com.jme3.util.NativeObject;
 import com.jme3.util.NativeObjectManager;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL45;
@@ -31,6 +32,20 @@ import org.lwjgl.opengl.GL45;
 public class GLRenderUtils {
     
     private static GLRenderUtils instance;
+
+    private static HashMap<Integer, String> errorDecoder = new HashMap<>();
+    static {
+        errorDecoder.put(1280, "GL_INVALID_ENUM");
+        errorDecoder.put(1281, "GL_INVALID_VALUE");
+        errorDecoder.put(1282, "GL_INVALID_OPERATION");
+        errorDecoder.put(1283, "GL_STACK_OVERFLOW");
+        errorDecoder.put(1284, "GL_STACK_UNDERFLOW");
+        errorDecoder.put(1285, "GL_OUT_OF_MEMORY");
+        errorDecoder.put(1286, "GL_INVALID_FRAMEBUFFER_OPERATION");
+    }
+    private static String getDecodedErrorMessage(int flag) {
+        return errorDecoder.getOrDefault(flag, "unidentified");
+    }
     
     public static GLRenderUtils initialize(Application app) {
         return (instance = new GLRenderUtils(app));
@@ -44,7 +59,7 @@ public class GLRenderUtils {
     public static void checkError(String message) {
         int flag = GL11.glGetError();
         if (flag != GL11.GL_NO_ERROR) {
-            throw new RuntimeException("OpenGL error: " + flag + (message != null ? " (" + message + ")" : ""));
+            throw new RuntimeException("OpenGL error: " + flag + " (" + (message != null ? message : getDecodedErrorMessage(flag)) + ")");
         }
     }
     

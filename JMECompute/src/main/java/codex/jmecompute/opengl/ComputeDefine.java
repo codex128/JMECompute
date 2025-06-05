@@ -4,6 +4,8 @@
  */
 package codex.jmecompute.opengl;
 
+import java.util.Objects;
+
 /**
  *
  * @author codex
@@ -22,7 +24,7 @@ public class ComputeDefine {
     }
 
     public final boolean setValue(Object val) {
-        if (value != val && (value == null || !value.equals(val))) {
+        if (!Objects.equals(value, val)) {
             boolean enabled = isEnabled();
             Object prevVal = value;
             if (isRawType(val)) {
@@ -45,8 +47,8 @@ public class ComputeDefine {
     }
 
     public static boolean isRawType(Object val) {
-        return val != null && (val instanceof Boolean || val instanceof Integer
-                || val instanceof Float || val instanceof String);
+        return val instanceof Boolean || val instanceof Integer
+                || val instanceof Float || val instanceof String;
     }
 
 }

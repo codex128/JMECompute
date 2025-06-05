@@ -34,11 +34,8 @@ public final class WorkSize {
         set(globalX, globalY, globalZ, localX, localY, localZ);
     }
     
-    private int verify(int val) {
-        if (val <= 0) {
-            throw new IllegalArgumentException("Work demension must be greater than zero.");
-        }
-        return val;
+    private int clamp(int val) {
+        return Math.max(val, 1);
     }
     
     public WorkSize set(WorkSize size) {
@@ -54,12 +51,12 @@ public final class WorkSize {
         return set(global, global, global, local, local, local);
     }
     public WorkSize set(int globalX, int globalY, int globalZ, int localX, int localY, int localZ) {
-        this.globalX = verify(globalX);
-        this.globalY = verify(globalY);
-        this.globalZ = verify(globalZ);
-        this.localX = verify(localX);
-        this.localY = verify(localY);
-        this.localZ = verify(localZ);
+        this.globalX = clamp(globalX);
+        this.globalY = clamp(globalY);
+        this.globalZ = clamp(globalZ);
+        this.localX = clamp(localX);
+        this.localY = clamp(localY);
+        this.localZ = clamp(localZ);
         return this;
     }
     
@@ -70,9 +67,9 @@ public final class WorkSize {
         return setGlobal(global, global, global);
     }
     public WorkSize setGlobal(int x, int y, int z) {
-        this.globalX = verify(x);
-        this.globalY = verify(y);
-        this.globalZ = verify(z);
+        this.globalX = clamp(x);
+        this.globalY = clamp(y);
+        this.globalZ = clamp(z);
         return this;
     }
     
@@ -83,77 +80,100 @@ public final class WorkSize {
         return setLocal(local, local, local);
     }
     public WorkSize setLocal(int x, int y, int z) {
-        this.localX = verify(x);
-        this.localY = verify(y);
-        this.localZ = verify(z);
+        this.localX = clamp(x);
+        this.localY = clamp(y);
+        this.localZ = clamp(z);
         return this;
     }
 
     public WorkSize setGlobalX(int globalX) {
-        this.globalX = verify(globalX);
+        this.globalX = clamp(globalX);
         return this;
     }
     public WorkSize setGlobalY(int globalY) {
-        this.globalY = verify(globalY);
+        this.globalY = clamp(globalY);
         return this;
     }
     public WorkSize setGlobalZ(int globalZ) {
-        this.globalZ = verify(globalZ);
+        this.globalZ = clamp(globalZ);
         return this;
     }
     public WorkSize setLocalX(int localX) {
-        this.localX = verify(localX);
+        this.localX = clamp(localX);
         return this;
     }
     public WorkSize setLocalY(int localY) {
-        this.localY = verify(localY);
+        this.localY = clamp(localY);
         return this;
     }
     public WorkSize setLocalZ(int localZ) {
-        this.localZ = verify(localZ);
+        this.localZ = clamp(localZ);
         return this;
+    }
+
+    public WorkSize setX(int global, int local) {
+        return setGlobalX(global).setLocalX(local);
+    }
+    public WorkSize setY(int global, int local) {
+        return setGlobalY(global).setLocalY(local);
+    }
+    public WorkSize setZ(int global, int local) {
+        return setGlobalZ(global).setLocalZ(local);
+    }
+
+    public WorkSize clear() {
+        return set(1, 1, 1, 1, 1, 1);
+    }
+    public WorkSize clearX() {
+        return setGlobalX(1).setLocalX(1);
+    }
+    public WorkSize clearY() {
+        return setGlobalY(1).setLocalY(1);
+    }
+    public WorkSize clearZ() {
+        return setGlobalZ(1).setLocalZ(1);
     }
     
     public WorkSize offloadToGlobal(int n) {
         return offloadToGlobal(n, n, n);
     }
     public WorkSize offloadToGlobal(int x, int y, int z) {
-        verify(globalX *= x);
-        verify(globalY *= y);
-        verify(globalZ *= x);
-        verify(localX /= x);
-        verify(localY /= y);
-        verify(localZ /= z);
+        globalX = clamp(globalX * x);
+        globalY = clamp(globalY * y);
+        globalZ = clamp(globalZ * x);
+        localX = clamp(localX / x);
+        localY = clamp(localY / y);
+        localZ = clamp(localZ / z);
         return this;
     }
     public WorkSize shiftToGlobal(int n) {
-        verify(globalX = globalX << n);
-        verify(globalY = globalY << n);
-        verify(globalZ = globalZ << n);
-        verify(localX = localX >> n);
-        verify(localY = localY >> n);
-        verify(localZ = localZ >> n);
+        globalX = clamp(globalX << n);
+        globalY = clamp(globalY << n);
+        globalZ = clamp(globalZ << n);
+        localX = clamp(localX >> n);
+        localY = clamp(localY >> n);
+        localZ = clamp(localZ >> n);
         return this;
     }
     public WorkSize offloadToLocal(int n) {
         return offloadToLocal(n, n, n);
     }
     public WorkSize offloadToLocal(int x, int y, int z) {
-        verify(globalX /= x);
-        verify(globalY /= y);
-        verify(globalZ /= x);
-        verify(localX *= x);
-        verify(localY *= y);
-        verify(localZ *= z);
+        globalX = clamp(globalX / x);
+        globalY = clamp(globalY / y);
+        globalZ = clamp(globalZ / x);
+        localX = clamp(localX * x);
+        localY = clamp(localY * y);
+        localZ = clamp(localZ * z);
         return this;
     }
     public WorkSize shiftToLocal(int n) {
-        verify(globalX = globalX >> n);
-        verify(globalY = globalY >> n);
-        verify(globalZ = globalZ >> n);
-        verify(localX = localX << n);
-        verify(localY = localY << n);
-        verify(localZ = localZ << n);
+        globalX = clamp(globalX >> n);
+        globalY = clamp(globalY >> n);
+        globalZ = clamp(globalZ >> n);
+        localX = clamp(localX << n);
+        localY = clamp(localY << n);
+        localZ = clamp(localZ << n);
         return this;
     }
 
@@ -240,18 +260,16 @@ public final class WorkSize {
             if (this.localY != other.localY) {
                 return false;
             }
-            if (this.localZ != other.localZ) {
-                return false;
-            }
+            return this.localZ == other.localZ;
         }
         return true;
     }
     
     @Override
     public String toString() {
-        return new StringBuilder().append("WorkSize[global=(").append(globalX).append(", ").append(globalY)
-                .append(", ").append(globalZ).append("); local=(").append(localX).append(", ").append(localY)
-                .append(", ").append(localZ).append(")]").toString();
+        return "WorkSize[global=(" + globalX + ", " + globalY +
+                ", " + globalZ + "); local=(" + localX + ", " + localY +
+                ", " + localZ + ")]";
     }
     @Override
     public int hashCode() {
@@ -270,7 +288,7 @@ public final class WorkSize {
         return equals(obj, true, true);
     }
     @Override
-    @SuppressWarnings("CloneDoesntCallSuperClone")
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public WorkSize clone() {
         return new WorkSize(this);
     }
