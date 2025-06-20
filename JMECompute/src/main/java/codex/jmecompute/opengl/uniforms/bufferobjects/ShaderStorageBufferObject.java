@@ -67,7 +67,7 @@ public abstract class ShaderStorageBufferObject <T extends NativeObject, R> exte
     }
     protected void createData() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer i = stack.callocInt(1);
+            IntBuffer i = stack.mallocInt(1);
             GL15.glGenBuffers(i);
             value.setId(i.get(0));
             GLRenderUtils.get().registerNative(value);
@@ -102,7 +102,7 @@ public abstract class ShaderStorageBufferObject <T extends NativeObject, R> exte
         } else if (buf instanceof Long) {
             GL45.glBufferData(GL45.GL_SHADER_STORAGE_BUFFER, (Long)buf, usage);
         } else {
-            throw new UnsupportedOperationException("Cannot bind with " + buf.getClass().getName());
+            throw new UnsupportedOperationException("Cannot bind " + buf.getClass().getName());
         }
     }
     

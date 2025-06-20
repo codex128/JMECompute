@@ -11,7 +11,7 @@ import org.lwjgl.PointerBuffer;
  * @author codex
  */
 public final class WorkSize {
-    
+
     private int globalX, globalY, globalZ;
     private int localX, localY, localZ;
     
@@ -206,22 +206,18 @@ public final class WorkSize {
         return globalX * globalY * globalZ * localX * localY * localZ;
     }
     public int getNumGlobalDemensions() {
-        if (globalY <= 1) {
-            return 1;
-        } else if (globalZ <= 1) {
-            return 2;
-        } else {
-            return 3;
-        }
+        int n = 3;
+        if (globalX <= 1) n--;
+        if (globalY <= 1) n--;
+        if (globalZ <= 1) n--;
+        return n;
     }
     public int getNumLocalDemensions() {
-        if (localY <= 1) {
-            return 1;
-        } else if (localZ <= 1) {
-            return 2;
-        } else {
-            return 3;
-        }
+        int n = 3;
+        if (localX <= 1) n--;
+        if (localY <= 1) n--;
+        if (localZ <= 1) n--;
+        return n;
     }
     
     public PointerBuffer fillGlobalBuffer(PointerBuffer buf) {

@@ -68,7 +68,7 @@ public class GLRenderUtils {
     private final GLRenderer renderer;
     private final RenderContext context;
     private final GLImageFormat[][] formats;
-    private AtomicLong nextNativeId = new AtomicLong(0);
+    private final AtomicLong nextNativeId = new AtomicLong(0);
     
     private GLRenderUtils(Application app) {
         if (!(app.getRenderer() instanceof GLRenderer)) {

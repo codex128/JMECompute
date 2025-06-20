@@ -10,7 +10,7 @@ repositories {
 }
 
 project.ext {
-    jmeVer = '3.8.0-alpha2'
+    jmeVer = '3.8.1-stable'
     boostVer = 'dd2f4b856d'
 }
 
